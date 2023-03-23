@@ -44,13 +44,16 @@ object ElasticUtils {
 
         val propertiesMap: MutableMap<String, Any> = mutableMapOf()
 
-        // Convert the input map into the expected JSON format
         for ((key, value) in map) {
             propertiesMap[key] = mapOf(Pair("type", value))
         }
 
-        val outputMap = mapOf(Pair("mappings",
-            mapOf(Pair("properties", propertiesMap))
+        val outputMap = mapOf(
+            Pair(
+                "mappings",
+                mapOf(
+                    Pair("properties", propertiesMap)
+                )
         ))
 
         return gson.toJson(outputMap)
