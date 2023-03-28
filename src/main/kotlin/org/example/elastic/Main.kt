@@ -4,9 +4,12 @@ object Main {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        val elastic = Elastic("192.168.0.200", 9200, "http")
+        val host = "192.168.0.200"
+        val port = 9200
 
-        val indiceName: String = "company-test-04"
+        val elastic2 = ElasticClient(host, port)
+
+        val indiceName = "company-test-06"
 
         val inputMap: Map<String, String> = mapOf(
             "field1" to "text",
@@ -14,10 +17,27 @@ object Main {
             "field3" to "date"
         )
 
-        println(ElasticUtils.isIndexNameValid(indiceName))
+        val data1 = mapOf("field1" to "foo", "field2" to 64, "field3" to "2023-03-28")
+        val data2 = mapOf("field1" to "bar", "field2" to 1000, "field3" to "2023-02-12")
 
-        elastic.createIndice(indiceName, inputMap)
+        val data: List<Map<String, Any>> = listOf(data1, data2)
 
-        elastic.closeClient()
+        println(ElasticUtils.generateMapping(inputMap))
+
+        println("start")
+
+        elastic2.createIndex(indiceName, inputMap)
+        elastic2.bulkIndex(indiceName, data)
+
+        val documents: List<Map<String, Any>> = listOf(data1, data2)
+        val maxSize = 100 * 1024 * 1024 // 100 MB
+        val documentSublists = ElasticUtils.splitDocumentsBySize(documents, maxSize)
+
+        for (sublist in documentSublists) {
+            elastic2.bulkIndex(indiceName, sublist)
+        }
+
+        println("end")
+
     }
 }
