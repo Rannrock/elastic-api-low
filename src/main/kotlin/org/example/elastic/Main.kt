@@ -9,7 +9,7 @@ object Main {
 
         val elastic2 = ElasticClient(host, port)
 
-        val indiceName = "company-test-06"
+        val indiceName = "company-test-07"
 
         val inputMap: Map<String, String> = mapOf(
             "field1" to "text",
@@ -26,8 +26,7 @@ object Main {
 
         println("start")
 
-        elastic2.createIndex(indiceName, inputMap)
-        elastic2.bulkIndex(indiceName, data)
+        elastic2.createIndexAsync(indiceName, inputMap) { x, e -> if (x) {println(x)} else {println(e)}  }
 
         val documents: List<Map<String, Any>> = listOf(data1, data2)
         val maxSize = 100 * 1024 * 1024 // 100 MB
@@ -40,4 +39,5 @@ object Main {
         println("end")
 
     }
+
 }
